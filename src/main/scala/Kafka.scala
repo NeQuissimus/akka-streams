@@ -9,8 +9,8 @@ import scaladsl._
 
 import org.apache.kafka.clients.producer._
 
-object Test extends App {
-  implicit val system = ActorSystem("TestSystem")
+object IntoKafka extends App {
+  implicit val system = ActorSystem("IntoKafkaSystem")
   implicit val materializer = ActorFlowMaterializer()
   implicit val ec = materializer.executionContext
 
@@ -18,9 +18,7 @@ object Test extends App {
 
   val source = Source(1 to 10)
 
-  val kafkaSink = Sink.foreach[ProducerRecord[Array[Byte], Array[Byte]]] { r =>
-    kafkaProducer.send(r)
-  }
+  val kafkaSink = Sink.foreach[ProducerRecord[Array[Byte], Array[Byte]]](kafkaProducer.send(_))
 
   val flow = source
                 .map(i => UUID.randomUUID)
